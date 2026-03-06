@@ -1,0 +1,15 @@
+[package]
+name = "web-timeline"
+description = "A timeline application in Rust"
+version = "0.1.0"
+readme = "README.md"
+edition = "2024"
+
+[dependencies]
+egui = "0.29.1"
+egui_plot = "0.29"
+eframe = "0.29"
+
+[[bin]]
+name = "timeline_demo"
+path = "src/main.rs"

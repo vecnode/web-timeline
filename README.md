@@ -1,2 +1,3 @@
-# web-timeline
-A timeline application in Rust
+# egui_timeline
+
+A timeline library for egui

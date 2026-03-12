@@ -327,11 +327,17 @@ impl TimelineView {
     }
 }
 
+struct ContextMenuState {
+    pos: egui::Pos2,
+    panel: String,
+}
+
 /// Main application struct that composes Model, Controller, and View
 struct TimelineApp {
     model: TimelineModel,
     controller: TimelineController,
     _view: TimelineView,
+    context_menu: Option<ContextMenuState>,
 }
 
 impl TimelineApp {
@@ -371,6 +377,7 @@ impl Default for TimelineApp {
             model: TimelineModel::new(),
             controller: TimelineController::new(),
             _view: TimelineView::new(),
+            context_menu: None,
         }
     }
 }
@@ -603,7 +610,7 @@ impl eframe::App for TimelineApp {
             let timeline = Timeline::new().header(180.0);
             let show = timeline.show(ui, self);
 
-            show.paint_grid(self)
+            let set_playhead = show.paint_grid(self)
                 .pinned_tracks(|tracks, ui| {
                     // Ruler track
                     tracks.next(ui).header(|ui| {
@@ -1101,7 +1108,8 @@ impl eframe::App for TimelineApp {
                     },
                     Some(self as &dyn PlayheadApi),
                     Some(self as &dyn TrackSelectionApi),
-                )
+                );
+            set_playhead
                 .playhead(ui, self, Playhead::new())
                 .run_scroll_and_zoom(ui, self)
                 .top_panel_time(
@@ -1155,6 +1163,47 @@ impl eframe::App for TimelineApp {
                     }, // Set total_seconds
                 )
                 .bottom_bar(ui, &mut self.model.global_panel_visible);
+
+            // Right-click context menu (keep existing right-click deselect behavior from track interaction).
+            if ui.input(|i| i.pointer.secondary_pressed()) {
+                if let Some(pos) = ui.input(|i| i.pointer.interact_pos()) {
+                    if let Some(panel_name) = set_playhead.panel_name_at_pos(pos) {
+                        println!("Right-click panel: {panel_name}");
+                        self.context_menu = Some(ContextMenuState {
+                            pos,
+                            panel: panel_name.to_string(),
+                        });
+                    } else {
+                        self.context_menu = None;
+                    }
+                }
+            }
+
+            let mut close_menu = false;
+            if let Some(menu_state) = self.context_menu.as_ref() {
+                egui::Area::new(egui::Id::new("timeline_context_menu"))
+                    .order(egui::Order::Foreground)
+                    .fixed_pos(menu_state.pos)
+                    .show(ui.ctx(), |ui| {
+                        egui::Frame::popup(ui.style()).show(ui, |ui| {
+                            ui.label(format!("Panel: {}", menu_state.panel));
+                            ui.separator();
+                            if ui.button("Copy").clicked() {
+                                println!("Context menu action: Copy ({})", menu_state.panel);
+                                close_menu = true;
+                            }
+                            if ui.button("Paste").clicked() {
+                                println!("Context menu action: Paste ({})", menu_state.panel);
+                                close_menu = true;
+                            }
+                        });
+                    });
+            }
+            if close_menu
+                || ui.input(|i| i.key_pressed(egui::Key::Escape) || i.pointer.primary_clicked())
+            {
+                self.context_menu = None;
+            }
 
 
             

@@ -2,7 +2,6 @@
 
 ## Ongoing
 
-- [ ] Selection on Right-Mouse click (dropdown)
 - [ ] Copy/Paste Blocks between tracks
 - [ ] Multi-select Blocks (Shift+Click)
 - [ ] Snap to grid
@@ -20,6 +19,7 @@
 
 ## Completed
 
+- [x] Selection on Right-Mouse click (dropdown)
 - [x] Fit Blocks on Tracks equally
 - [x] Marker track
 - [x] Scroll the Tracks

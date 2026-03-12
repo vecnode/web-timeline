@@ -258,6 +258,51 @@ impl SetPlayhead {
         self
     }
 
+    /// Return the main panel name at a given pointer position.
+    pub fn panel_name_at_pos(&self, pos: egui::Pos2) -> Option<&'static str> {
+        if let Some(top_rect) = self.top_panel_rect {
+            if top_rect.contains(pos) {
+                return Some("Top Panel");
+            }
+        }
+        if let Some(bottom_rect) = self.bottom_bar_rect {
+            if bottom_rect.contains(pos) {
+                return Some("Bottom Bar (Global)");
+            }
+        }
+
+        let content_top = self
+            .top_panel_rect
+            .map(|r| r.max.y)
+            .unwrap_or(self.timeline_rect().min.y);
+        let content_bottom = self
+            .bottom_bar_rect
+            .map(|r| r.min.y)
+            .unwrap_or(self.timeline_rect().max.y);
+
+        if pos.y < content_top || pos.y > content_bottom {
+            return None;
+        }
+
+        if pos.x < self.timeline_rect().min.x {
+            if pos.y < self.tracks_top() {
+                Some("Header (Ruler/Marker)")
+            } else {
+                Some("Track Header")
+            }
+        } else if pos.x <= self.timeline_rect().max.x {
+            if pos.y < self.tracks_top() {
+                Some("Ruler/Marker")
+            } else if pos.y <= self.tracks_bottom() {
+                Some("Tracks")
+            } else {
+                Some("Timeline Area Below Tracks")
+            }
+        } else {
+            None
+        }
+    }
+
     /// Display time in the top panel.
     /// 
     /// `playhead_api` should provide access to the current playhead position.

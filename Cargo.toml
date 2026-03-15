@@ -1,5 +1,5 @@
 [package]
-name = "web-timeline"
+name = "ams-timeline"
 description = "A timeline application in Rust"
 version = "0.1.0"
 readme = "README.md"

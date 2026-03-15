@@ -1,4 +1,4 @@
-use web_timeline::{
+use ams_timeline::{
     playhead::{Info, Interaction, Playhead, PlayheadApi},
     ruler::{musical, MusicalInfo, MusicalInteract, MusicalRuler},
     Bar, TimeSig, Timeline, TimelineApi, TrackSelectionApi,
@@ -99,7 +99,7 @@ fn main() -> eframe::Result<()> {
         ..Default::default()
     };
     eframe::run_native(
-        "web-timeline",
+        "ams-timeline",
         options,
         Box::new(|_cc| Ok(Box::new(TimelineApp::default()) as Box<dyn eframe::App>)),
     )
@@ -599,7 +599,7 @@ impl eframe::App for TimelineApp {
         
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.vertical_centered(|ui| {
-                ui.heading("web-timeline");
+                ui.heading("ams-timeline");
                 ui.separator();
             });
 
